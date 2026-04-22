@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PinjamIn</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #f5f7fb;
+}
+
+/* LOGIN */
+.login-wrapper {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+}
+
+.login-card {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 16px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.logo {
+    color: #2563eb;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+/* NAVBAR */
+.navbar {
+    background: #2563eb;
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* CONTAINER */
+.container {
+    padding: 20px;
+}
+
+/* CARDS */
+.cards {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.card {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.card h3 {
+    margin: 0;
+    color: #888;
+    font-size: 14px;
+}
+
+.card p {
+    font-size: 24px;
+    margin: 5px 0 0;
+}
+
+/* SEARCH */
+.search {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+th {
+    background: #f1f5f9;
+    padding: 12px;
+    text-align: left;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+/* STATUS */
+.status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.dipinjam {
+    background: #fde68a;
+}
+
+.kembali {
+    background: #bbf7d0;
+}
+
+/* BUTTON */
+.btn {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: white;
+    color: #2563eb;
+    font-weight: bold;
+}
+
+.btn-danger {
+    background: red;
+    color: white;
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+    margin: 10% auto;
+}
+
+.modal input, .modal select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+    .cards {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" class="login-wrapper">
+    <div class="login-card">
+        <h2 class="logo">📦 PinjamIn</h2>
+        <p class="subtitle">Masuk ke akun kamu</p>
+
+        <input id="username" placeholder="Username">
+        <input id="password" type="password" placeholder="Password">
+
+        <button onclick="login()" class="login-btn">Masuk</button>
+    </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
+    <div class="navbar">
+        <h2>PinjamIn</h2>
+        <button class="btn btn-primary" onclick="openModal()">+ Tambah Pinjaman</button>
+    </div>
+
+    <div class="container">
+
+        <!-- STATS -->
+        <div class="cards">
+            <div class="card">
+                <h3>Total Barang</h3>
+                <p id="total"></p>
+            </div>
+            <div class="card">
+                <h3>Sedang Dipinjam</h3>
+                <p id="dipinjam"></p>
+            </div>
+            <div class="card">
+                <h3>Dikembalikan</h3>
+                <p id="kembali"></p>
+            </div>
+        </div>
+
+        <!-- SEARCH -->
+        <input id="search" class="search" placeholder="Cari..." onkeyup="render()">
+
+        <!-- TABLE -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Barang</th>
+                    <th>Peminjam</th>
+                    <th>Tanggal</th>
+                    <th>Estimasi</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="data"></tbody>
+        </table>
+
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <h3>Tambah Data</h3>
+        <input id="barang" placeholder="Nama Barang">
+        <input id="peminjam" placeholder="Nama Peminjam">
+        <input type="date" id="tanggal">
+        <input type="date" id="kembaliInput">
+        <select id="status">
+            <option value="dipinjam">Dipinjam</option>
+            <option value="kembali">Dikembalikan</option>
+        </select>
+        <button onclick="save()" class="btn btn-primary">Simpan</button>
+    </div>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("data")) || [];
+
+// LOGIN
+function login(){
+    if(username.value==="revel" && password.value==="liam9904"){
+        sessionStorage.setItem("login",true);
+        showApp();
+    } else alert("Login salah");
+}
+
+function showApp(){
+    loginPage.style.display="none";
+    app.style.display="block";
+    render();
+}
+
+if(sessionStorage.getItem("login")) showApp();
+
+// MODAL
+function openModal(){ modal.style.display="block"; }
+function closeModal(){ modal.style.display="none"; }
+
+// SAVE
+function save(){
+    data.push({
+        barang: barang.value,
+        peminjam: peminjam.value,
+        tanggal: tanggal.value,
+        kembali: kembaliInput.value,
+        status: status.value
+    });
+    localStorage.setItem("data",JSON.stringify(data));
+    closeModal();
+    render();
+}
+
+// DELETE
+function hapus(i){
+    if(confirm("Hapus data?")){
+        data.splice(i,1);
+        localStorage.setItem("data",JSON.stringify(data));
+        render();
+    }
+}
+
+// RENDER
+function render(){
+    let key = search.value.toLowerCase();
+    let html="";
+    let t=0,d=0,k=0;
+
+    data.forEach((x,i)=>{
+        if(x.barang.toLowerCase().includes(key)||x.peminjam.toLowerCase().includes(key)){
+            t++;
+            x.status==="dipinjam"?d++:k++;
+
+            let telat="";
+            let now=new Date();
+            let end=new Date(x.kembali);
+
+            if(x.status==="dipinjam" && now>end){
+                let diff=Math.floor((now-end)/(1000*60*60*24));
+                telat=`<br><span style="color:red">Terlambat ${diff} hari</span>`;
+            }
+
+            html+=`
+            <tr>
+                <td>${x.barang}</td>
+                <td>${x.peminjam}</td>
+                <td>${x.tanggal}</td>
+                <td>${x.kembali}${telat}</td>
+                <td><span class="status ${x.status}">${x.status}</span></td>
+                <td><button onclick="hapus(${i})" class="btn btn-danger">Hapus</button></td>
+            </tr>`;
+        }
+    });
+
+    dataEl.innerHTML=html;
+    total.textContent=t;
+    dipinjam.textContent=d;
+    kembali.textContent=k;
+}
+
+// ELEMENT
+const dataEl=document.getElementById("data");
+</script>
+
+</body>
+</html>
